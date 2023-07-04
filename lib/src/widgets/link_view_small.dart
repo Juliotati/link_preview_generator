@@ -164,15 +164,12 @@ class LinkViewSmall extends StatelessWidget {
                   )
                 : const SizedBox(),
             Expanded(
-              child: Container(
-                alignment: const Alignment(-1.0, -1.0),
-                child: Text(
-                  description,
-                  textAlign: TextAlign.left,
-                  style: _bodyTS,
-                  overflow: bodyTextOverflow ?? TextOverflow.ellipsis,
-                  maxLines: bodyMaxLines ?? _maxLines,
-                ),
+              child: Text(
+                description,
+                textAlign: TextAlign.left,
+                style: _bodyTS,
+                overflow: bodyTextOverflow ?? TextOverflow.ellipsis,
+                maxLines: bodyMaxLines ?? _maxLines,
               ),
             ),
           ],
