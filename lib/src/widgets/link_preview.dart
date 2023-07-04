@@ -210,16 +210,20 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
           );
   }
 
+  Future<void> _loadWebInfo() async {
+    _url = ((widget.proxyUrl ?? '') + widget.link).trim();
+    _info = await LinkPreviewAnalyzer.getInfoFromCache(_url);
+
+    if (_info == null) {
+      _loading = true;
+      await _getInfo();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    _url = ((widget.proxyUrl ?? '') + widget.link).trim();
-    _info = LinkPreviewAnalyzer.getInfoFromCache(_url) as WebInfo?;
-    if (_info == null) {
-      _loading = true;
-      _getInfo();
-    }
+    _loadWebInfo();
   }
 
   Widget _buildLinkContainer(
