@@ -12,7 +12,7 @@ class LinkPreviewAnalyzer {
     Duration cacheDuration = const Duration(hours: 24),
     bool multimedia = true,
   }) async {
-    var cachedInfo = await getInfoFromCache(url);
+    final cachedInfo = await getInfoFromCache(url);
 
     if (cachedInfo != null) return cachedInfo;
 
@@ -34,23 +34,25 @@ class LinkPreviewAnalyzer {
   }
 
   /// Get web information
-  /// return [InfoBase]
   static Future<WebInfo?> getInfoFromCache(String? url) async {
     final prefs = await SharedPreferences.getInstance();
 
     final info = prefs.getString(_cacheKey(url));
-    final durationString = prefs.getString(_cacheKey(url, isDuration: true));
 
-    if (durationString == null) return null;
+    if (info == null) return null;
+
+    final nowString =
+        DateTime.now().subtract(const Duration(minutes: 1)).toIso8601String();
+
+    final durationString =
+        prefs.getString(_cacheKey(url, isDuration: true)) ?? nowString;
 
     final duration = DateTime.parse(durationString);
 
-    if (info != null && !duration.isAfter(DateTime.now())) {
+    if (DateTime.now().isBefore(duration)) {
       await prefs.remove(_cacheKey(url, isDuration: true));
       return null;
     }
-
-    if (info == null) return null;
 
     return WebInfo.fromJson(jsonDecode(info));
   }
