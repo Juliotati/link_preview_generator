@@ -146,7 +146,8 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
   WebInfo? _info;
 
   bool _loading = false;
-  late String _url;
+
+  String _url = '';
 
   Widget _buildLinkContainer(
     double _height, {
@@ -277,7 +278,9 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
   @override
   void initState() {
     super.initState();
-    _getInfo();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _getInfo();
+    });
   }
 
   @override
