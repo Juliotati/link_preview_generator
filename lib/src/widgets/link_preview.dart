@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:link_preview_generator/src/models/types.dart';
+import 'package:link_preview_generator/src/models/web_info.dart';
 import 'package:link_preview_generator/src/utils/analyzer.dart';
 import 'package:link_preview_generator/src/widgets/link_view_large.dart';
 import 'package:link_preview_generator/src/widgets/link_view_small.dart';
@@ -9,7 +9,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// A widget to convert your links into beautiful previews.
 class LinkPreviewGenerator extends StatefulWidget {
-
   /// Creates [LinkPreviewGenerator]
   const LinkPreviewGenerator({
     Key? key,
@@ -33,7 +32,7 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.description,
     this.errorBody = 'Oops! Unable to parse the url.',
     this.errorImage =
-    'https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif',
+        'https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif',
     this.errorTitle = 'Something went wrong!',
     this.borderRadius = 12.0,
     this.boxShadow,
@@ -316,8 +315,11 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
 
   Future<void> _getInfo() async {
     if (_url.startsWith('http') || _url.startsWith('https')) {
-      _info = await LinkPreviewAnalyzer.getInfo(_url,
-          cacheDuration: widget.cacheDuration, multimedia: true) as WebInfo?;
+      _info = await LinkPreviewAnalyzer.getInfo(
+        _url,
+        cacheDuration: widget.cacheDuration,
+        multimedia: true,
+      );
     } else {
       print('Error: $_url is not starting with either http or https.');
     }

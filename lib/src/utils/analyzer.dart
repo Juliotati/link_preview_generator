@@ -1,44 +1,65 @@
-import 'package:link_preview_generator/src/models/types.dart';
+import 'dart:convert';
+
+import 'package:link_preview_generator/src/models/web_info.dart';
 import 'package:link_preview_generator/src/utils/scrapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Link Preview Analyzer
 class LinkPreviewAnalyzer {
-  static final Map<String?, InfoBase> _map = {};
-
   /// Get web information
-  /// return [InfoBase]
-  static Future<InfoBase?> getInfo(
+  static Future<WebInfo?> getInfo(
     String url, {
     Duration cacheDuration = const Duration(hours: 24),
     bool multimedia = true,
   }) async {
-    // final start = DateTime.now();
+    var cachedInfo = await getInfoFromCache(url);
 
-    var info = getInfoFromCache(url);
-    if (info != null) return info;
+    if (cachedInfo != null) return cachedInfo;
+
     try {
-      info = await LinkPreview.scrapeFromURL(url);
+      final info = await LinkPreview.scrapeFromURL(url);
 
-      info.timeout = DateTime.now().add(cacheDuration);
-      _map[url] = info;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_cacheKey(url), jsonEncode(info.toJson()));
+      await prefs.setString(
+        _cacheKey(url, isDuration: true),
+        DateTime.now().add(cacheDuration).toIso8601String(),
+      );
+
+      return info;
     } catch (e) {
       print('Get web error: $url, Error: $e');
+      return null;
     }
-
-    // print("$url cost ${DateTime.now().difference(start).inMilliseconds}");
-
-    return info;
   }
 
   /// Get web information
   /// return [InfoBase]
-  static InfoBase? getInfoFromCache(String? url) {
-    final info = _map[url];
-    if (info != null && !info.timeout.isAfter(DateTime.now())) {
-      _map.remove(url);
+  static Future<WebInfo?> getInfoFromCache(String? url) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final info = prefs.getString(_cacheKey(url));
+    final durationString = prefs.getString(_cacheKey(url, isDuration: true));
+
+    if (durationString == null) return null;
+
+    final duration = DateTime.parse(durationString);
+
+    if (info != null && !duration.isAfter(DateTime.now())) {
+      await prefs.remove(_cacheKey(url, isDuration: true));
       return null;
     }
-    return info;
+
+    if (info == null) return null;
+
+    return WebInfo.fromJson(jsonDecode(info));
+  }
+
+  static String _cacheKey(String? value, {bool isDuration = false}) {
+    if (isDuration) {
+      return '$value-duration';
+    }
+    return value ?? '';
   }
 
   /// Is it an empty string

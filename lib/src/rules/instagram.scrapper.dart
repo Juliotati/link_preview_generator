@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:link_preview_generator/src/models/types.dart';
+import 'package:link_preview_generator/src/models/web_info.dart';
 import 'package:link_preview_generator/src/utils/scrapper.dart';
 import 'package:universal_html/html.dart';
 

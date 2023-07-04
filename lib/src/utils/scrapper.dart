@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
-import 'package:link_preview_generator/src/models/types.dart';
+import 'package:link_preview_generator/src/models/web_info.dart';
 import 'package:link_preview_generator/src/rules/amazon.scrapper.dart';
 import 'package:link_preview_generator/src/rules/default.scrapper.dart';
 import 'package:link_preview_generator/src/rules/image.scrapper.dart';
