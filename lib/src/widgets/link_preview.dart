@@ -30,6 +30,7 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.placeholderWidget,
     this.proxyUrl,
     this.errorWidget,
+    this.description,
     this.errorBody = 'Oops! Unable to parse the url.',
     this.errorImage =
     'https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif',
@@ -73,6 +74,10 @@ class LinkPreviewGenerator extends StatefulWidget {
 
   /// Cache result time, default cache `7 days`.
   final Duration cacheDuration;
+
+  /// Exposes the description from the url preview.
+  /// If null the untempered description will be displayed
+  final String Function(String data)? description;
 
   /// Body that need to be shown if parsing fails.
   /// Defaults to `Oops! Unable to parse the url.`
@@ -195,7 +200,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
                 ? info.title
                 : widget.errorTitle,
             desc: LinkPreviewAnalyzer.isNotEmpty(info.description)
-                ? info.description
+                ? widget.description?.call(info.description) ?? info.description
                 : widget.errorBody,
             image: LinkPreviewAnalyzer.isNotEmpty(info.image)
                 ? info.image
