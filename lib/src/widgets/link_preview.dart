@@ -36,7 +36,7 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.errorTitle = 'Something went wrong!',
     this.borderRadius = 12.0,
     this.boxShadow,
-    this.removeElevation = false,
+    this.removeShadow = false,
   }) : super(key: key);
 
   /// Customize the background colour.
@@ -50,12 +50,11 @@ class LinkPreviewGenerator extends StatefulWidget {
   /// Customize `body` [TextStyle].
   final TextStyle? bodyStyle;
 
-  /// Give the overflow type for body text (Description).
-  /// Default to `TextOverflow.ellipsis`.
+  /// Give the overflow type for body text (Description). Default to
+  /// `TextOverflow.ellipsis`.
   final TextOverflow bodyTextOverflow;
 
-  /// BorderRadius for the card.
-  /// Defaults to `12.0`.
+  /// BorderRadius for the card. Defaults to `12.0`.
   final double borderRadius;
 
   /// Box shadow for the card.
@@ -66,7 +65,8 @@ class LinkPreviewGenerator extends StatefulWidget {
   ///   spreadRadius: 1,
   ///   blurRadius: 5,
   ///   color: Colors.grey.withOpacity(0.5),
-  ///   offset: Offset(0, 3),)
+  ///   offset: Offset(0, 3),
+  ///  )
   /// ]
   /// ```
   final List<BoxShadow>? boxShadow;
@@ -112,28 +112,22 @@ class LinkPreviewGenerator extends StatefulWidget {
   /// For example, `https://cors-anywhere.herokuapp.com/` .
   final String? proxyUrl;
 
-  /// To remove the card elevation set it to `true`.
-  /// Defaults to `false`.
-  final bool removeElevation;
+  /// To remove the card shadow effect set it to `true`. Defaults to `false`.
+  final bool removeShadow;
 
-  /// Show or Hide body text (Description).
-  /// Defaults to `true`.
+  /// Show or Hide body text (Description). Defaults to `true`.
   final bool showBody;
 
-  /// Show or Hide domain name.
-  /// Defaults to `true`.
+  /// Show or Hide domain name. Defaults to `true`.
   final bool showDomain;
 
-  /// Show or Hide image, if available.
-  /// Defaults to `true`.
+  /// Show or Hide image, if available. Defaults to `true`.
   final bool showGraphic;
 
-  /// Show or Hide title.
-  /// Defaults to `true`.
+  /// Show or Hide title. Defaults to `true`.
   final bool showTitle;
 
-  /// Adjust the box fit of the image.
-  /// Defaults to [BoxFit.cover].
+  /// Adjust the box fit of the image. Defaults to [BoxFit.cover].
   final BoxFit graphicFit;
 
   /// Customize `title` [TextStyle].
@@ -142,7 +136,7 @@ class LinkPreviewGenerator extends StatefulWidget {
   /// Function that needs to be called when user taps on the card.
   /// If not given then given URL will be launched.
   /// Pass empty function to disable tap.
-  final void Function()? onTap;
+  final void Function(WebInfo? data)? onTap;
 
   @override
   _LinkPreviewGeneratorState createState() => _LinkPreviewGeneratorState();
@@ -150,34 +144,167 @@ class LinkPreviewGenerator extends StatefulWidget {
 
 class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
   WebInfo? _info;
+
   bool _loading = false;
   late String _url;
+
+  Widget _buildLinkContainer(
+    double _height, {
+    String? domain = '',
+    String? title = '',
+    String? desc = '',
+    String? image = '',
+    bool isIcon = false,
+  }) {
+    return SizedBox(
+      height: _height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: widget.backgroundColor,
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          boxShadow: widget.removeShadow
+              ? null
+              : widget.boxShadow ??
+                  [
+                    BoxShadow(
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      color: Colors.grey.withOpacity(0.5),
+                      offset: const Offset(0, 3),
+                    )
+                  ],
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          onTap: widget.onTap != null
+              ? () => widget.onTap?.call(_info)
+              : () => _launchURL(widget.link),
+          child: (widget.linkPreviewStyle == LinkPreviewStyle.small)
+              ? LinkViewSmall(
+                  key: widget.key ?? Key(widget.link),
+                  url: widget.link,
+                  domain: domain!,
+                  title: title!,
+                  description: desc!,
+                  imageUri: image!,
+                  titleTextStyle: widget.titleStyle,
+                  bodyTextStyle: widget.bodyStyle,
+                  bodyTextOverflow: widget.bodyTextOverflow,
+                  bodyMaxLines: widget.bodyMaxLines,
+                  showBody: widget.showBody,
+                  showDomain: widget.showDomain,
+                  showGraphic: widget.showGraphic,
+                  showTitle: widget.showTitle,
+                  graphicFit: widget.graphicFit,
+                  isIcon: isIcon,
+                  bgColor: widget.backgroundColor,
+                  radius: widget.borderRadius,
+                )
+              : LinkViewLarge(
+                  key: widget.key ?? Key(widget.link.toString()),
+                  url: widget.link,
+                  domain: domain!,
+                  title: title!,
+                  description: desc!,
+                  imageUri: image!,
+                  titleTextStyle: widget.titleStyle,
+                  bodyTextStyle: widget.bodyStyle,
+                  bodyTextOverflow: widget.bodyTextOverflow,
+                  bodyMaxLines: widget.bodyMaxLines,
+                  showBody: widget.showBody,
+                  showDomain: widget.showDomain,
+                  showGraphic: widget.showGraphic,
+                  showTitle: widget.showTitle,
+                  graphicFit: widget.graphicFit,
+                  isIcon: isIcon,
+                  bgColor: widget.backgroundColor,
+                  radius: widget.borderRadius,
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceHolder(Color color, double defaultHeight) {
+    return SizedBox(
+      height: defaultHeight,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          var layoutWidth = constraints.biggest.width;
+          var layoutHeight = constraints.biggest.height;
+
+          return Container(
+            color: color,
+            width: layoutWidth,
+            height: layoutHeight,
+          );
+        },
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    try {
+      await launch(url);
+    } catch (err) {
+      throw Exception('Could not launch $url. Error: $err');
+    }
+  }
+
+  Future<void> _getInfo() async {
+    _loading = true;
+    if (mounted) setState(() {});
+
+    _url = widget.link;
+
+    if (!_url.startsWith('http://') || !_url.startsWith('https://')) {
+      _url = 'https://$_url';
+    }
+
+    _url = ((widget.proxyUrl ?? '') + widget.link).trim();
+    if (_url.startsWith('http') || _url.startsWith('https')) {
+      _info = await LinkPreviewAnalyzer.getInfo(
+        _url,
+        cacheDuration: widget.cacheDuration,
+      );
+    } else {
+      print('Error: $_url is not starting with either http or https.');
+    }
+    _loading = false;
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
     final info = _info;
     var _height = (widget.linkPreviewStyle == LinkPreviewStyle.small ||
             !widget.showGraphic)
-        ? MediaQuery.of(context).size.height * 0.15
-        : MediaQuery.of(context).size.height * 0.30;
+        ? MediaQuery.sizeOf(context).height * 0.15
+        : MediaQuery.sizeOf(context).height * 0.30;
 
     if (_loading) {
       return widget.placeholderWidget ??
           Container(
             height: _height,
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery.sizeOf(context).width,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(widget.borderRadius),
               color: const Color.fromRGBO(248, 248, 248, 1.0),
             ),
-            alignment: Alignment.center,
             child: const Text('Fetching data...'),
           );
     }
 
     if (_info != null) {
       if (_info!.type == LinkPreviewType.image) {
-        var img = _info!.image;
+        final img = _info!.image;
         return _buildLinkContainer(
           _height,
           title: widget.errorTitle,
@@ -208,141 +335,5 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
                     : widget.errorImage,
             isIcon: LinkPreviewAnalyzer.isNotEmpty(info.image) ? false : true,
           );
-  }
-
-  Future<void> _loadWebInfo() async {
-    _url = ((widget.proxyUrl ?? '') + widget.link).trim();
-    _info = await LinkPreviewAnalyzer.getInfoFromCache(_url);
-
-    if (_info == null) {
-      _loading = true;
-      await _getInfo();
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadWebInfo();
-  }
-
-  Widget _buildLinkContainer(
-    double _height, {
-    String? domain = '',
-    String? title = '',
-    String? desc = '',
-    String? image = '',
-    bool isIcon = false,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: widget.backgroundColor,
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        boxShadow: widget.removeElevation
-            ? []
-            : widget.boxShadow ??
-                [
-                  BoxShadow(
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    color: Colors.grey.withOpacity(0.5),
-                    offset: const Offset(0, 3),
-                  )
-                ],
-      ),
-      height: _height,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        onTap: widget.onTap ?? () => _launchURL(widget.link),
-        child: (widget.linkPreviewStyle == LinkPreviewStyle.small)
-            ? LinkViewSmall(
-                key: widget.key ?? Key(widget.link.toString()),
-                url: widget.link,
-                domain: domain!,
-                title: title!,
-                description: desc!,
-                imageUri: image!,
-                titleTextStyle: widget.titleStyle,
-                bodyTextStyle: widget.bodyStyle,
-                bodyTextOverflow: widget.bodyTextOverflow,
-                bodyMaxLines: widget.bodyMaxLines,
-                showBody: widget.showBody,
-                showDomain: widget.showDomain,
-                showGraphic: widget.showGraphic,
-                showTitle: widget.showTitle,
-                graphicFit: widget.graphicFit,
-                isIcon: isIcon,
-                bgColor: widget.backgroundColor,
-                radius: widget.borderRadius,
-              )
-            : LinkViewLarge(
-                key: widget.key ?? Key(widget.link.toString()),
-                url: widget.link,
-                domain: domain!,
-                title: title!,
-                description: desc!,
-                imageUri: image!,
-                titleTextStyle: widget.titleStyle,
-                bodyTextStyle: widget.bodyStyle,
-                bodyTextOverflow: widget.bodyTextOverflow,
-                bodyMaxLines: widget.bodyMaxLines,
-                showBody: widget.showBody,
-                showDomain: widget.showDomain,
-                showGraphic: widget.showGraphic,
-                showTitle: widget.showTitle,
-                graphicFit: widget.graphicFit,
-                isIcon: isIcon,
-                bgColor: widget.backgroundColor,
-                radius: widget.borderRadius,
-              ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceHolder(Color color, double defaultHeight) {
-    return SizedBox(
-      height: defaultHeight,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          var layoutWidth = constraints.biggest.width;
-          var layoutHeight = constraints.biggest.height;
-
-          return Container(
-            color: color,
-            width: layoutWidth,
-            height: layoutHeight,
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _getInfo() async {
-    if (_url.startsWith('http') || _url.startsWith('https')) {
-      _info = await LinkPreviewAnalyzer.getInfo(
-        _url,
-        cacheDuration: widget.cacheDuration,
-        multimedia: true,
-      );
-    } else {
-      print('Error: $_url is not starting with either http or https.');
-    }
-    if (mounted) {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      try {
-        await launch(url);
-      } catch (err) {
-        throw Exception('Could not launch $url. Error: $err');
-      }
-    }
   }
 }
