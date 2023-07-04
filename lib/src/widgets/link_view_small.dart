@@ -146,6 +146,7 @@ class LinkViewSmall extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(5, 3, 5, 0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             showDomain
                 ? Padding(
