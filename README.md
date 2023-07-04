@@ -41,10 +41,14 @@ import 'package:link_preview_generator/link_preview_generator.dart';
 
 /// Pass the URL to be parsed/scraped
 /// to build your own custom widget with parsed data
+```
 final WebInfo info = await LinkPreview.scrapeFromURL('https://github.com/ghpranav/link_preview_generator');
+```
 
 /// Description of the page.
+```
 final String description = info.description;
+```
 
 /// Domain name of the link.
 final String domain = info.domain;
@@ -71,7 +75,7 @@ final String video = info.video;
 ### LinkPreviewGenerator
 
 | PropName              | Description                                                 | PropType          | value                                                                                                                               | required |
-| --------------------- | ----------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------- |
+|-----------------------|-------------------------------------------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------|----------|
 | **link**              | URL to display as preview                                   | String            |                                                                                                                                     | `true`   |
 | **backgroundColor**   | Customize the background colour of widget                   | Color             | default(`Color.fromRGBO(248, 248, 248, 1.0)`)                                                                                       | `false`  |
 | **bodyMaxLines**      | Maximum number of description body lines                    | int               | default(`auto`)                                                                                                                     | `false`  |
