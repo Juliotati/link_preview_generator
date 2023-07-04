@@ -9,8 +9,38 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// A widget to convert your links into beautiful previews.
 class LinkPreviewGenerator extends StatefulWidget {
+
+  /// Creates [LinkPreviewGenerator]
+  const LinkPreviewGenerator({
+    Key? key,
+    required this.link,
+    this.cacheDuration = const Duration(days: 7),
+    this.titleStyle,
+    this.bodyStyle,
+    this.linkPreviewStyle = LinkPreviewStyle.large,
+    this.showBody = true,
+    this.showDomain = true,
+    this.showGraphic = true,
+    this.showTitle = true,
+    this.graphicFit = BoxFit.cover,
+    this.backgroundColor = const Color.fromRGBO(248, 248, 248, 1.0),
+    this.bodyMaxLines,
+    this.bodyTextOverflow = TextOverflow.ellipsis,
+    this.onTap,
+    this.placeholderWidget,
+    this.proxyUrl,
+    this.errorWidget,
+    this.errorBody = 'Oops! Unable to parse the url.',
+    this.errorImage =
+    'https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif',
+    this.errorTitle = 'Something went wrong!',
+    this.borderRadius = 12.0,
+    this.boxShadow,
+    this.removeElevation = false,
+  }) : super(key: key);
+
   /// Customize the background colour.
-  /// Deaults to `Color.fromRGBO(248, 248, 248, 1.0)`.
+  /// Defaults to `Color.fromRGBO(248, 248, 248, 1.0)`.
   final Color backgroundColor;
 
   /// Give the limit to body text (Description).
@@ -21,36 +51,41 @@ class LinkPreviewGenerator extends StatefulWidget {
   final TextStyle? bodyStyle;
 
   /// Give the overflow type for body text (Description).
-  /// Deaults to `TextOverflow.ellipsis`.
+  /// Default to `TextOverflow.ellipsis`.
   final TextOverflow bodyTextOverflow;
 
   /// BorderRadius for the card.
-  /// Deafults to `12.0`.
+  /// Defaults to `12.0`.
   final double borderRadius;
 
   /// Box shadow for the card.
-  ///  Deafults to `[BoxShadow(
-  ///               spreadRadius: 1,
-  ///               blurRadius: 5,
-  ///               color: Colors.grey.withOpacity(0.5),
-  ///               offset: Offset(0, 3),)]`.
+  /// Defaults to:
+  /// ```
+  /// [
+  ///  BoxShadow(
+  ///   spreadRadius: 1,
+  ///   blurRadius: 5,
+  ///   color: Colors.grey.withOpacity(0.5),
+  ///   offset: Offset(0, 3),)
+  /// ]
+  /// ```
   final List<BoxShadow>? boxShadow;
 
   /// Cache result time, default cache `7 days`.
   final Duration cacheDuration;
 
   /// Body that need to be shown if parsing fails.
-  /// Deaults to `Oops! Unable to parse the url.`
+  /// Defaults to `Oops! Unable to parse the url.`
   final String errorBody;
 
   /// Image URL that will be shown if parsing fails
   /// & when multimedia enabled & no meta data is available.
-  /// Deaults to `A crying semi-soccer ball image`.
+  /// Defaults to `A crying semi-soccer ball image`.
   /// https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif
   final String errorImage;
 
   /// Title that need to be shown if parsing fails.
-  /// Deaults to `Something went wrong!`
+  /// Defaults to `Something went wrong!`
   final String errorTitle;
 
   /// Widget that needs to be shown if parsing fails.
@@ -104,35 +139,6 @@ class LinkPreviewGenerator extends StatefulWidget {
   /// If not given then given URL will be launched.
   /// Pass empty function to disable tap.
   final void Function()? onTap;
-
-  /// Creates [LinkPreviewGenerator]
-  const LinkPreviewGenerator({
-    Key? key,
-    required this.link,
-    this.cacheDuration = const Duration(days: 7),
-    this.titleStyle,
-    this.bodyStyle,
-    this.linkPreviewStyle = LinkPreviewStyle.large,
-    this.showBody = true,
-    this.showDomain = true,
-    this.showGraphic = true,
-    this.showTitle = true,
-    this.graphicFit = BoxFit.cover,
-    this.backgroundColor = const Color.fromRGBO(248, 248, 248, 1.0),
-    this.bodyMaxLines,
-    this.bodyTextOverflow = TextOverflow.ellipsis,
-    this.onTap,
-    this.placeholderWidget,
-    this.proxyUrl,
-    this.errorWidget,
-    this.errorBody = 'Oops! Unable to parse the url.',
-    this.errorImage =
-        'https://raw.githubusercontent.com/ghpranav/link_preview_generator/main/assets/giphy.gif',
-    this.errorTitle = 'Something went wrong!',
-    this.borderRadius = 12.0,
-    this.boxShadow,
-    this.removeElevation = false,
-  }) : super(key: key);
 
   @override
   _LinkPreviewGeneratorState createState() => _LinkPreviewGeneratorState();
@@ -238,6 +244,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
       ),
       height: _height,
       child: InkWell(
+        borderRadius: BorderRadius.circular(widget.borderRadius),
         onTap: widget.onTap ?? () => _launchURL(widget.link),
         child: (widget.linkPreviewStyle == LinkPreviewStyle.small)
             ? LinkViewSmall(
