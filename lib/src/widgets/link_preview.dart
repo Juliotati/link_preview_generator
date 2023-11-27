@@ -13,6 +13,7 @@ class LinkPreviewGenerator extends StatefulWidget {
   const LinkPreviewGenerator({
     Key? key,
     required this.link,
+    this.info,
     this.cacheDuration = const Duration(days: 7),
     this.titleStyle,
     this.bodyStyle,
@@ -37,7 +38,12 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.borderRadius = 12.0,
     this.boxShadow,
     this.removeShadow = false,
+    this.onInfoLoaded,
   }) : super(key: key);
+
+
+  /// Link information from the web.
+  final WebInfo? info;
 
   /// Customize the background colour.
   /// Defaults to `Color.fromRGBO(248, 248, 248, 1.0)`.
@@ -137,6 +143,10 @@ class LinkPreviewGenerator extends StatefulWidget {
   /// If not given then given URL will be launched.
   /// Pass empty function to disable tap.
   final void Function(WebInfo? data)? onTap;
+
+  /// Called when [WebInfo] is loaded and ready to be used.
+  /// Usually used to cache the result else where
+  final void Function(WebInfo? data)? onInfoLoaded;
 
   @override
   _LinkPreviewGeneratorState createState() => _LinkPreviewGeneratorState();
@@ -253,6 +263,9 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
   }
 
   Future<void> _getInfo() async {
+    _info ??= widget.info;
+    if (_info != null) return;
+
     _loading = true;
     if (mounted) setState(() {});
 
@@ -268,6 +281,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
         _url,
         cacheDuration: widget.cacheDuration,
       );
+      widget.onInfoLoaded?.call(_info);
     } else {
       print('Error: $_url is not starting with either http or https.');
     }
