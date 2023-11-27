@@ -1,3 +1,7 @@
+## 1.3.0
+
+- Expose info when loaded
+
 ## 1.2.0
 
 - Bump minimum Flutter version.
