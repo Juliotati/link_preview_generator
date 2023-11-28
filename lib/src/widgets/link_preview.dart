@@ -41,7 +41,6 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.onInfoLoaded,
   }) : super(key: key);
 
-
   /// Link information from the web.
   final WebInfo? info;
 
@@ -287,6 +286,17 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
     }
     _loading = false;
     if (mounted) setState(() {});
+  }
+
+  void _updateInfo(WebInfo? info) {
+    _info = info;
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void didUpdateWidget(covariant LinkPreviewGenerator oldWidget) {
+    if (oldWidget.info != widget.info) _updateInfo(widget.info);
+    super.didUpdateWidget(oldWidget);
   }
 
   @override

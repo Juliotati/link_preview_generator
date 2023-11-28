@@ -1,3 +1,7 @@
+## 1.3.1
+
+- Update widget info when provided info changes
+
 ## 1.3.0
 
 - Expose info when loaded
