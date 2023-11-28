@@ -240,13 +240,10 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
       height: defaultHeight,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          var layoutWidth = constraints.biggest.width;
-          var layoutHeight = constraints.biggest.height;
-
           return Container(
             color: color,
-            width: layoutWidth,
-            height: layoutHeight,
+            width: constraints.biggest.width,
+            height: constraints.biggest.height,
           );
         },
       ),
@@ -263,12 +260,16 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
 
   Future<void> _getInfo() async {
     _info ??= widget.info;
-    if (_info != null) return;
+    _url = widget.link;
+
+    if (mounted) setState(() {});
+
+    if (_info != null) {
+      return;
+    }
 
     _loading = true;
     if (mounted) setState(() {});
-
-    _url = widget.link;
 
     if (!_url.startsWith('http://') || !_url.startsWith('https://')) {
       _url = 'https://$_url';
