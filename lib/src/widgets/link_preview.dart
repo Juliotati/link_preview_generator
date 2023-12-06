@@ -264,6 +264,12 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
 
     if (mounted) setState(() {});
 
+    if (_url.isEmpty) {
+      print('Empty url, using placeholder');
+      _info = null;
+      return;
+    }
+
     if (_info != null) {
       return;
     }

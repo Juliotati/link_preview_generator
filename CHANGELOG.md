@@ -1,3 +1,7 @@
+## 1.4.1
+
+- Show placeholder on empty urls
+
 ## 1.4.0
 
 - Fix url not updated when info already exists
