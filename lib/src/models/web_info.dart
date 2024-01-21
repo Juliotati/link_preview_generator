@@ -16,7 +16,11 @@ enum LinkPreviewType {
   instagram,
   twitter,
   youtube,
-  error,
+  error;
+
+  const LinkPreviewType();
+
+  bool get isError => this == LinkPreviewType.error;
 }
 
 /// Represents the Web Information object.

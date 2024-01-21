@@ -1,3 +1,7 @@
+## 1.4.2
+
+- Ensure error widget is displayed when given and WebInfo is of error type
+
 ## 1.4.1
 
 - Show placeholder on empty urls

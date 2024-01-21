@@ -11,8 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 class LinkPreviewGenerator extends StatefulWidget {
   /// Creates [LinkPreviewGenerator]
   const LinkPreviewGenerator({
-    Key? key,
     required this.link,
+    super.key,
     this.info,
     this.cacheDuration = const Duration(days: 7),
     this.titleStyle,
@@ -39,7 +39,7 @@ class LinkPreviewGenerator extends StatefulWidget {
     this.boxShadow,
     this.removeShadow = false,
     this.onInfoLoaded,
-  }) : super(key: key);
+  });
 
   /// Link information from the web.
   final WebInfo? info;
@@ -262,7 +262,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
     _info ??= widget.info;
     _url = widget.link;
 
-    if (mounted) setState(() {});
+    _updateState();
 
     if (_url.isEmpty) {
       print('Empty url, using placeholder');
@@ -271,11 +271,13 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
     }
 
     if (_info != null) {
+      _loading = false;
+      _updateState();
       return;
     }
 
     _loading = true;
-    if (mounted) setState(() {});
+    _updateState();
 
     if (!_url.startsWith('http://') || !_url.startsWith('https://')) {
       _url = 'https://$_url';
@@ -283,7 +285,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
 
     _url = ((widget.proxyUrl ?? '') + widget.link).trim();
     if (_url.startsWith('http') || _url.startsWith('https')) {
-      _info = await LinkPreviewAnalyzer.getInfo(
+      _info = await LinkPreviewAnalyzer.info(
         _url,
         cacheDuration: widget.cacheDuration,
       );
@@ -292,12 +294,16 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
       print('Error: $_url is not starting with either http or https.');
     }
     _loading = false;
+    _updateState();
+  }
+
+  void _updateState() {
     if (mounted) setState(() {});
   }
 
   void _updateInfo(WebInfo? info) {
     _info = info;
-    if (mounted) setState(() {});
+    _updateState();
   }
 
   @override
@@ -317,7 +323,7 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
   @override
   Widget build(BuildContext context) {
     final info = _info;
-    var _height = (widget.linkPreviewStyle == LinkPreviewStyle.small ||
+    final _height = (widget.linkPreviewStyle == LinkPreviewStyle.small ||
             !widget.showGraphic)
         ? MediaQuery.sizeOf(context).height * 0.15
         : MediaQuery.sizeOf(context).height * 0.30;
@@ -349,25 +355,26 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
       }
     }
 
-    return _info == null
-        ? widget.errorWidget ??
-            _buildPlaceHolder(widget.backgroundColor, _height)
-        : _buildLinkContainer(
-            _height,
-            domain:
-                LinkPreviewAnalyzer.isNotEmpty(info!.domain) ? info.domain : '',
-            title: LinkPreviewAnalyzer.isNotEmpty(info.title)
-                ? info.title
-                : widget.errorTitle,
-            desc: LinkPreviewAnalyzer.isNotEmpty(info.description)
-                ? widget.description?.call(info.description) ?? info.description
-                : widget.errorBody,
-            image: LinkPreviewAnalyzer.isNotEmpty(info.image)
-                ? info.image
-                : LinkPreviewAnalyzer.isNotEmpty(info.icon)
-                    ? info.icon
-                    : widget.errorImage,
-            isIcon: LinkPreviewAnalyzer.isNotEmpty(info.image) ? false : true,
-          );
+    if (_info == null) {
+      return widget.errorWidget ??
+          _buildPlaceHolder(widget.backgroundColor, _height);
+    }
+
+    return _buildLinkContainer(
+      _height,
+      domain: LinkPreviewAnalyzer.isNotEmpty(info!.domain) ? info.domain : '',
+      title: LinkPreviewAnalyzer.isNotEmpty(info.title)
+          ? info.title
+          : widget.errorTitle,
+      desc: LinkPreviewAnalyzer.isNotEmpty(info.description)
+          ? widget.description?.call(info.description) ?? info.description
+          : widget.errorBody,
+      image: LinkPreviewAnalyzer.isNotEmpty(info.image)
+          ? info.image
+          : LinkPreviewAnalyzer.isNotEmpty(info.icon)
+              ? info.icon
+              : widget.errorImage,
+      isIcon: LinkPreviewAnalyzer.isNotEmpty(info.image) ? false : true,
+    );
   }
 }

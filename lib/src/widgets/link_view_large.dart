@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
 
-/// Large type LinkPreviewGenerator widget
 class LinkViewLarge extends StatelessWidget {
+  const LinkViewLarge({
+    required this.url,
+    required this.domain,
+    required this.title,
+    required this.description,
+    required this.imageUri,
+    required this.graphicFit,
+    required this.showBody,
+    required this.showDomain,
+    required this.showGraphic,
+    required this.showTitle,
+    super.key,
+    this.titleTextStyle,
+    this.bodyTextStyle,
+    this.domainTextStyle,
+    this.bodyTextOverflow,
+    this.bodyMaxLines,
+    this.isIcon = false,
+    this.bgColor,
+    this.radius,
+  });
+
   final Color? bgColor;
   final int? bodyMaxLines;
   final TextOverflow? bodyTextOverflow;
@@ -21,48 +42,26 @@ class LinkViewLarge extends StatelessWidget {
   final TextStyle? titleTextStyle;
   final String url;
 
-  const LinkViewLarge({
-    Key? key,
-    required this.url,
-    required this.domain,
-    required this.title,
-    required this.description,
-    required this.imageUri,
-    required this.graphicFit,
-    required this.showBody,
-    required this.showDomain,
-    required this.showGraphic,
-    required this.showTitle,
-    this.titleTextStyle,
-    this.bodyTextStyle,
-    this.domainTextStyle,
-    this.bodyTextOverflow,
-    this.bodyMaxLines,
-    this.isIcon = false,
-    this.bgColor,
-    this.radius,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        var layoutWidth = constraints.biggest.width;
-        var layoutHeight = constraints.biggest.height;
+        final layoutWidth = constraints.biggest.width;
+        final layoutHeight = constraints.biggest.height;
 
-        var _titleTS = titleTextStyle ??
+        final _titleTS = titleTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutHeight),
               color: Colors.black,
               fontWeight: FontWeight.bold,
             );
-        var _bodyTS = bodyTextStyle ??
+        final _bodyTS = bodyTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutHeight) - 1,
               color: Colors.grey,
               fontWeight: FontWeight.w400,
             );
-        var _domainTS = bodyTextStyle ??
+        final _domainTS = bodyTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutHeight) - 1,
               color: Colors.blue,

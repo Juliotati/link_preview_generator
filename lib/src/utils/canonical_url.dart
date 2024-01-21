@@ -9,22 +9,21 @@ bool _matchesPort(String scheme, int port) {
 /// The UrlCanonicalizer is used for the process of converting an URL into a
 /// canonical (normalized) form.
 class UrlCanonicalizer {
-  final List<String>? blacklist;
-
-  final List<String>? order;
-  final bool removeFragment;
-  final bool sort;
-  final bool sortValues;
-  final List<String>? whitelist;
-
   UrlCanonicalizer({
     this.sort = true,
     this.sortValues = false,
-    this.order,
     this.removeFragment = false,
+    this.order,
     this.whitelist,
     this.blacklist,
   });
+
+  final bool sort;
+  final bool sortValues;
+  final bool removeFragment;
+  final List<String>? order;
+  final List<String>? whitelist;
+  final List<String>? blacklist;
 
   /// Converts a URL into a canonical (normalized) form.
   T canonicalize<T>(T url, {T? context}) {

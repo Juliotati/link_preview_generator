@@ -6,39 +6,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Link Preview Analyzer
 class LinkPreviewAnalyzer {
-  /// Get web information
-  static Future<WebInfo?> getInfo(
+  /// Get web meta data information from the given [url].
+  static Future<WebInfo?> info(
     String url, {
-    Duration cacheDuration = const Duration(hours: 24),
+    Duration cacheDuration = const Duration(days: 30),
     bool multimedia = true,
   }) async {
-    final cachedInfo = await getInfoFromCache(url);
-
+    final cachedInfo = await infoFromCache(url);
     if (cachedInfo != null) return cachedInfo;
 
     try {
       final info = await LinkPreview.scrapeFromURL(url);
+      if (info.type.isError) return null;
 
       final prefs = await SharedPreferences.getInstance();
+
+      final cacheDurationStr =
+          DateTime.now().add(cacheDuration).toIso8601String();
       await prefs.setString(_cacheKey(url), jsonEncode(info.toJson()));
-      await prefs.setString(
-        _cacheKey(url, isDuration: true),
-        DateTime.now().add(cacheDuration).toIso8601String(),
-      );
+      await prefs.setString(_cacheKey(url, isDuration: true), cacheDurationStr);
 
       return info;
     } catch (e) {
-      print('Get web error: $url, Error: $e');
+      print('WebInfo error: $url, Error: $e');
       return null;
     }
   }
 
-  /// Get web information
-  static Future<WebInfo?> getInfoFromCache(String? url) async {
+  static Future<WebInfo?> infoFromCache(String? url) async {
     final prefs = await SharedPreferences.getInstance();
-
     final info = prefs.getString(_cacheKey(url));
-
     if (info == null) return null;
 
     final nowString =
@@ -48,7 +45,6 @@ class LinkPreviewAnalyzer {
         prefs.getString(_cacheKey(url, isDuration: true)) ?? nowString;
 
     final duration = DateTime.parse(durationString);
-
     if (DateTime.now().isBefore(duration)) {
       await prefs.remove(_cacheKey(url, isDuration: true));
       return null;
@@ -64,7 +60,6 @@ class LinkPreviewAnalyzer {
     return value ?? '';
   }
 
-  /// Is it an empty string
   static bool isNotEmpty(String? str) =>
       str != null && str.isNotEmpty && str.trim().isNotEmpty;
 }

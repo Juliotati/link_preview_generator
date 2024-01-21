@@ -102,14 +102,19 @@ class LinkPreviewScrapper {
   }
 
   static String? getAttrOfDocElement(
-      HtmlDocument doc, String query, String attr) {
+    HtmlDocument doc,
+    String query,
+    String attr,
+  ) {
     var attribute = doc.querySelectorAll(query).firstOrNull?.getAttribute(attr);
 
     if (attribute != null && attribute.isNotEmpty) return attribute;
+    return null;
   }
 
-  static String getBaseUrl(HtmlDocument doc, String url) =>
-      getAttrOfDocElement(doc, 'base', 'href') ?? Uri.parse(url).origin;
+  static String getBaseUrl(HtmlDocument doc, String url) {
+    return getAttrOfDocElement(doc, 'base', 'href') ?? Uri.parse(url).origin;
+  }
 
   static String? getDomain(HtmlDocument doc, String url) {
     try {
@@ -186,12 +191,15 @@ class LinkPreviewScrapper {
       String? docTitle = doc.title;
       // ignore: unnecessary_null_comparison
       if (docTitle != null && docTitle.isNotEmpty) return docTitle;
+
       final h1El = doc.querySelector('h1');
       final h1 = h1El?.innerHtml;
       if (h1 != null && h1.isNotEmpty) return h1;
+
       final h2El = doc.querySelector('h2');
       final h2 = h2El?.innerHtml;
       if (h2 != null && h2.isNotEmpty) return h2;
+
       return null;
     } catch (e) {
       print('Title resolution failure Error:$e');

@@ -2,6 +2,28 @@ import 'package:flutter/material.dart';
 
 /// Small type LinkPreviewGenerator widget
 class LinkViewSmall extends StatelessWidget {
+  const LinkViewSmall({
+    required this.url,
+    required this.domain,
+    required this.title,
+    required this.description,
+    required this.imageUri,
+    required this.graphicFit,
+    required this.showBody,
+    required this.showDomain,
+    required this.showGraphic,
+    required this.showTitle,
+    super.key,
+    this.titleTextStyle,
+    this.bodyTextStyle,
+    this.domainTextStyle,
+    this.bodyTextOverflow,
+    this.bodyMaxLines,
+    this.isIcon = false,
+    this.bgColor,
+    this.radius,
+  });
+
   final Color? bgColor;
   final int? bodyMaxLines;
   final TextOverflow? bodyTextOverflow;
@@ -21,48 +43,26 @@ class LinkViewSmall extends StatelessWidget {
   final TextStyle? titleTextStyle;
   final String url;
 
-  const LinkViewSmall({
-    Key? key,
-    required this.url,
-    required this.domain,
-    required this.title,
-    required this.description,
-    required this.imageUri,
-    required this.graphicFit,
-    required this.showBody,
-    required this.showDomain,
-    required this.showGraphic,
-    required this.showTitle,
-    this.titleTextStyle,
-    this.bodyTextStyle,
-    this.domainTextStyle,
-    this.bodyTextOverflow,
-    this.bodyMaxLines,
-    this.isIcon = false,
-    this.bgColor,
-    this.radius,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        var layoutWidth = constraints.biggest.width;
-        var layoutHeight = constraints.biggest.height;
+        final layoutWidth = constraints.biggest.width;
+        final layoutHeight = constraints.biggest.height;
 
-        var _titleFontSize = titleTextStyle ??
+        final _titleFontSize = titleTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutWidth),
               color: Colors.black,
               fontWeight: FontWeight.bold,
             );
-        var _bodyFontSize = bodyTextStyle ??
+        final _bodyFontSize = bodyTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutWidth) - 1,
               color: Colors.grey,
               fontWeight: FontWeight.w400,
             );
-        var _domainTS = bodyTextStyle ??
+        final _domainTS = bodyTextStyle ??
             TextStyle(
               fontSize: computeTitleFontSize(layoutHeight) - 1,
               color: Colors.blue,
@@ -140,7 +140,10 @@ class LinkViewSmall extends StatelessWidget {
   }
 
   Widget _buildBodyContainer(
-      TextStyle _bodyTS, TextStyle _domainTS, _maxLines) {
+    TextStyle _bodyTS,
+    TextStyle _domainTS,
+    _maxLines,
+  ) {
     return Expanded(
       flex: 2,
       child: Padding(

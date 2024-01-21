@@ -1,12 +1,12 @@
 name: link_preview_generator
 description: A cross-platform flutter package to convert your links into rich beautiful previews.
-version: 1.4.1
+version: 1.4.2
 homepage: https://github.com/ghpranav/
 repository: https://github.com/ghpranav/link_preview_generator
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
-  flutter: ">=2.5.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.16.7"
 
 dependencies:
   flutter:
