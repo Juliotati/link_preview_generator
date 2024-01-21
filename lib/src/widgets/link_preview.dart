@@ -342,6 +342,11 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
           );
     }
 
+    if (_info == null || _info?.type.isError == true) {
+      return widget.errorWidget ??
+          _buildPlaceHolder(widget.backgroundColor, _height);
+    }
+
     if (_info != null) {
       if (_info!.type == LinkPreviewType.image) {
         final img = _info!.image;
@@ -353,11 +358,6 @@ class _LinkPreviewGeneratorState extends State<LinkPreviewGenerator> {
               (img.trim() == '' ? widget.errorImage : img),
         );
       }
-    }
-
-    if (_info == null) {
-      return widget.errorWidget ??
-          _buildPlaceHolder(widget.backgroundColor, _height);
     }
 
     return _buildLinkContainer(

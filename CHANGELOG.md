@@ -1,3 +1,7 @@
+## 1.4.3
+
+- check for LinkPreviewType
+
 ## 1.4.2
 
 - Ensure error widget is displayed when given and WebInfo is of error type
